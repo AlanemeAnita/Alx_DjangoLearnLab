@@ -136,6 +136,23 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
+# Redirect all HTTP traffic to HTTPS
+SECURE_SSL_REDIRECT = True  # Ensures all requests use HTTPS
+
+# HTTP Strict Transport Security (HSTS)
+SECURE_HSTS_SECONDS = 31536000  # Enforce HTTPS for 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # Allow preloading in browsers
+
+# Secure cookies: only sent over HTTPS
+SESSION_COOKIE_SECURE = True  # Session cookies transmitted over HTTPS only
+CSRF_COOKIE_SECURE = True  # CSRF cookies transmitted over HTTPS only
+
+# Secure headers
+X_FRAME_OPTIONS = "DENY"  # Prevent clickjacking
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME type sniffing
+SECURE_BROWSER_XSS_FILTER = True  # Enable browser XSS filtering
+
 
 # Security settings explanation:
 # SECURE_BROWSER_XSS_FILTER enables browser XSS protection
