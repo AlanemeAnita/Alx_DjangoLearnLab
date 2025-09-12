@@ -136,6 +136,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
+# If Django is behind a proxy/load balancer (like Nginx/Heroku), this ensures request.is_secure() works correctly
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Redirect all HTTP traffic to HTTPS
 SECURE_SSL_REDIRECT = True  # Ensures all requests use HTTPS
 
