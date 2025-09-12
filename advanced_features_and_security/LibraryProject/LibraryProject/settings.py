@@ -127,3 +127,18 @@ AUTH_USER_MODEL = "bookshelf.CustomUser"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Security settings
+DEBUG = False  # Turn off debug in production
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+
+# Security settings explanation:
+# SECURE_BROWSER_XSS_FILTER enables browser XSS protection
+# X_FRAME_OPTIONS='DENY' prevents clickjacking
+# SECURE_CONTENT_TYPE_NOSNIFF stops content type sniffing
+# CSRF_COOKIE_SECURE and SESSION_COOKIE_SECURE ensure cookies only sent over HTTPS
