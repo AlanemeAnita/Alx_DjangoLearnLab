@@ -1,21 +1,47 @@
 {% extends "blog/base.html" %}
+
 {% block content %}
-    <article class="media content-section">
-        <img class="rounded-circle article-img" src="#" alt="">
-        <div class="media-body">
-            <div class="article-metadata">
-                <a class="mr-2" href="#">{{ object.author }}</a>
-                <small class="text-muted">{{ object.published_date|date:"F d, Y" }}</small>
-                {% if object.author == user %}
-                <div>
-                    <a class="btn btn-secondary btn-sm mt-1 mb-1" href="#">Update</a>
-                    <a class="btn btn-danger btn-sm mt-1 mb-1" href="#">Delete</a>
-                </div>
-                    
-                {% endif %}
+<article class="media content-section">
+    <img class="rounded-circle article-img" src="#" alt="">
+    <div class="media-body">
+        <div class="article-metadata">
+            <a class="mr-2" href="#">{{ object.author }}</a>
+            <small class="text-muted">{{ object.published_date|date:"F d, Y" }}</small>
+            {% if object.author == user %}
+            <div class="mt-1 mb-1">
+                <a class="btn btn-secondary btn-sm" href="{% url 'post-update' object.id %}">Update</a>
+                <a class="btn btn-danger btn-sm" href="{% url 'post-delete' object.id %}">Delete</a>
             </div>
-            <h2 class="article-title">{{ object.title }}</h2>
-            <p class="article-content">{{ object.content }}</p>
+            {% endif %}
         </div>
-    </article>
-{% endblock content%}
+
+        <h2 class="article-title">{{ object.title }}</h2>
+        <p class="article-content">{{ object.content }}</p>
+    </div>
+</article>
+
+<!-- Comment Section -->
+<section class="comments-section mt-4">
+    <h3>Comments</h3>
+
+    {% for comment in object.comments.all %}
+    <div class="mb-3 p-2 border rounded">
+        <strong>{{ comment.author.username }}</strong>
+        <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+        <p>{{ comment.content }}</p>
+        {% if comment.author == user %}
+            <a href="{% url 'edit-comment' comment.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+            <a href="{% url 'delete-comment' comment.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+        {% endif %}
+    </div>
+    {% empty %}
+        <p>No comments yet. Be the first to comment!</p>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+        <a href="{% url 'add-comment' object.id %}" class="btn btn-primary">Add Comment</a>
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in</a> to comment.</p>
+    {% endif %}
+</section>
+{% endblock content %}
