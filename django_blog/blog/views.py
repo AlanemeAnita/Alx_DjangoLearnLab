@@ -8,6 +8,7 @@ from django.contrib.auth.views import LoginView
 from .models import Post, Comment
 from .forms import CommentForm
 from django.db.models import Q
+from .models import Tag
 
 from .models import Post
 from django.urls import reverse_lazy
@@ -156,6 +157,16 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
+class PostByTagListView(ListView):
+    model = Post
+    template_name = "blog/posts_by_tag.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        # Get the tag_slug from the URL
+        tag_slug = self.kwargs.get("tag_slug")
+        return Post.objects.filter(tags__slug=tag_slug)
 
 
 # CREATE COMMENT
