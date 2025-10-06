@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-=tnmu9t6sjgp-(p393^1qi_flc&ur%z$jo_97*0pf&#x%#4^$6
 DEBUG = True
 
 ALLOWED_HOSTS = []
-AUTH_USER_MODEL = "accounts.User"
+AUTH_USER_MODEL = "accounts.CustomUser"
 
 DEBUG = False
 ALLOWED_HOSTS = ["*"]  # or your domain
@@ -128,6 +128,19 @@ REST_FRAMEWORK = {
     )
 }
 
+import os
+
+# Deployment settings
+PORT = os.environ.get("PORT", "8000")
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+STATIC_URL = "/static/"
+MEDIA_URL = "/media/"
+
+# Collect static configuration for production
+# python manage.py collectstatic will use this path
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

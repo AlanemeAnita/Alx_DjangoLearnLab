@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import Post, Like, Comment
+from notifications.models import Notification
 from .serializers import PostSerializer, CommentSerializer
 
 class FeedView(generics.ListAPIView):
@@ -63,16 +64,15 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 class LikePostView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
-        like, created = Like.objects.get_or_create(user=request.user, post=post)
-
-        if not created:
-            return Response({"detail": "Already liked"}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({"detail": f"You liked {post.title}"}, status=status.HTTP_201_CREATED)
+    def post(self, request, pk):
+        post = generics.get_object_or_404(Post, pk=pk)
+        post.likes.add(request.user)
+        Notification.objects.create(
+            recipient=post.author,
+            actor=request.user,
+            verb="liked your post"
+        )
+        return Response({"message": "Post liked successfully"}, status=status.HTTP_200_OK)
 
 class UnlikePostView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
