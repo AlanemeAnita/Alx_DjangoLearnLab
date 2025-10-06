@@ -6,7 +6,6 @@ from .models import Post, Comment, Like
 from notifications.models import Notification
 from .serializers import PostSerializer, CommentSerializer
 
-
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
@@ -75,9 +74,11 @@ class FeedView(generics.ListAPIView):
 class LikePostView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, post_id):
-        post = Post.objects.get(id=post_id)
-        Like.objects.get_or_create(user=request.user, post=post)
+    def post(self, request, pk):
+        post = generics.get_object_or_404(Post, pk=pk)  # <- use generics.get_object_or_404
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
+        if not created:
+            return Response({'detail': 'Already liked'}, status=status.HTTP_400_BAD_REQUEST)
         if post.author != request.user:
             Notification.objects.create(
                 sender=request.user,
@@ -85,13 +86,16 @@ class LikePostView(generics.GenericAPIView):
                 notification_type='like',
                 post=post
             )
-        return Response({'message': 'Post liked'}, status=status.HTTP_200_OK)
+        return Response({'detail': 'Post liked'}, status=status.HTTP_200_OK)
 
 
 class UnlikePostView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
-        Like.objects.filter(user=request.user, post=post).delete()
-        return Response({'message': 'Post unliked'}, status=status.HTTP_200_OK)
+    def post(self, request, pk):
+        post = generics.get_object_or_404(Post, pk=pk)  # <- use generics.get_object_or_404
+        like = Like.objects.filter(user=request.user, post=post).first()
+        if not like:
+            return Response({"detail": "You haven’t liked this post"}, status=status.HTTP_400_BAD_REQUEST)
+        like.delete()
+        return Response({"detail": f"You unliked {post.title}"}, status=status.HTTP_200_OK)
