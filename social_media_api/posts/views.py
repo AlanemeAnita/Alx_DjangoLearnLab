@@ -2,6 +2,7 @@ from rest_framework import viewsets, generics, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
 from .models import Post, Like, Comment
 from notifications.models import Notification
 from .serializers import PostSerializer, CommentSerializer
@@ -11,9 +12,31 @@ class FeedView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Post.objects.filter(
-            author__in=self.request.user.following.all()
-        ).order_by("-created_at")
+        user = self.request.user
+        following_users = user.following.all()
+        return Post.objects.filter(author__in=self.request.user.following.all()).order_by("-created_at")
+
+
+class LikePostView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        post.likes.add(request.user)
+        Notification.objects.create(
+            recipient=post.author,
+            actor=request.user,
+            verb="liked your post"
+        )
+        return Response({'message': 'Post liked'})
+
+class UnlikePostView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        post.likes.remove(request.user)
+        return Response({'message': 'Post unliked'})
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):

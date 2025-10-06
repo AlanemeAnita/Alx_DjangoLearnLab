@@ -1,5 +1,5 @@
 from django.urls import path
-from .import views
+from . import views
 from rest_framework.authtoken.views import obtain_auth_token
 from .views import RegisterView, UserDetailView, follow_user, unfollow_user, CustomAuthToken, FollowUserView, UnfollowUserView
 
@@ -12,7 +12,10 @@ urlpatterns = [
     path('login/', CustomAuthToken.as_view(), name='login'),
     path('follow/<int:user_id>/', follow_user, name='follow-user'),
     path('unfollow/<int:user_id>/', unfollow_user, name='unfollow-user'),
-    path("follow/<int:user_id>/", views.FollowUserView.as_view(), name="follow-user"),
-    path("unfollow/<int:user_id>/", views.UnfollowUserView.as_view(), name="unfollow-user"),
+    path('follow/<int:user_id>/', views.FollowUserView.as_view(), name='follow_user'),
+    path('unfollow/<int:user_id>/', views.UnfollowUserView.as_view(), name='unfollow_user'),
 ]
+
+
+
 

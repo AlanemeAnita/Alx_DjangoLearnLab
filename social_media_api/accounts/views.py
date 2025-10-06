@@ -13,6 +13,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
     serializer_class = RegisterSerializer
 
 class LoginView(generics.GenericAPIView):
@@ -27,7 +28,14 @@ class LoginView(generics.GenericAPIView):
             return Response({'token': token.key})
         return Response({'error': 'Invalid Credentials'}, status=400)
 
+class LoginView(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        token = Token.objects.get(key=response.data['token'])
+        return Response({'token': token.key, 'user_id': token.user_id, 'username': token.user.username})
+
 class ProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
     serializer_class = RegisterSerializer
     permission_classes = [permissions.IsAuthenticated]
 
