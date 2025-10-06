@@ -22,15 +22,17 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop("password2")
-        user = User.objects.create_user(
+        user = get_user_model().objects.create_user(
             username=validated_data["username"],
-            email=validated_data.get("email"),
+            email=validated_data.get("email", ""),
             password=validated_data["password"],
-            bio=validated_data.get("bio", ""),
-            profile_picture=validated_data.get("profile_picture", None),
         )
+        user.bio = validated_data.get("bio", "")
+        user.profile_picture = validated_data.get("profile_picture", None)
+        user.save()
         Token.objects.create(user=user)
         return user
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
