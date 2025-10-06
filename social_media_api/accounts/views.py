@@ -7,6 +7,9 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from .serializers import RegisterSerializer, UserSerializer
 from .models import User
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
@@ -48,4 +51,33 @@ class CustomAuthToken(ObtainAuthToken):
             'user_id': token.user_id,
             'username': token.user.username
         })
+
+# accounts/views.py
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class FollowUserView(APIView):
+    def post(self, request, pk):
+        try:
+            user_to_follow = User.objects.get(pk=pk)
+            request.user.following.add(user_to_follow)
+            return Response({"detail": "User followed successfully."}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class UnfollowUserView(APIView):
+    def post(self, request, pk):
+        try:
+            user_to_unfollow = User.objects.get(pk=pk)
+            request.user.following.remove(user_to_unfollow)
+            return Response({"detail": "User unfollowed successfully."}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 

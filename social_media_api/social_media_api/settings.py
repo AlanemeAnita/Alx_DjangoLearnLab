@@ -28,6 +28,20 @@ DEBUG = True
 ALLOWED_HOSTS = []
 AUTH_USER_MODEL = "accounts.User"
 
+DEBUG = False
+ALLOWED_HOSTS = ["*"]  # or your domain
+
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = "DENY"
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_SSL_REDIRECT = True
+
+STATIC_URL = "/static/"
+MEDIA_URL = "/media/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_ROOT = BASE_DIR / "media"
+
+
 
 # Application definition
 
